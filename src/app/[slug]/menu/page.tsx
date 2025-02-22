@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import RestaurantsHeader from "./components/header";
 import RestaurantCategories from "./components/categories";
-import { db } from "@/lib/prisma";
+import { getMenusBySlug } from "@/data/get-menus-by-slug";
 
 interface RestaurantMenuPageProps {
   params: Promise<{ slug: string }>;
@@ -21,14 +21,7 @@ const RestaurantMenuPage = async ({
   if (!isConsumptionMethodValid(orderConsumptionMethod)) {
     return notFound();
   }
-  const restaurant = await db.restaurant.findUnique({
-    where: { slug: slug },
-    include: {
-      menuCategories: {
-        include: { products: true },
-      },
-    },
-  });
+  const restaurant = await getMenusBySlug(slug);
   if (!restaurant) {
     return notFound();
   }
