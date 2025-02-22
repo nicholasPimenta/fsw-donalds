@@ -8,6 +8,7 @@ import { ChefHatIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import Image from "next/image";
 import { useContext, useState } from "react";
 import { CartContext } from "../../contexts/cart";
+import CartSheet from "../../components/cartSheet";
 
 interface ProductsDetailsProps {
   product: Prisma.ProductGetPayload<{
@@ -23,7 +24,7 @@ interface ProductsDetailsProps {
 }
 
 const ProductsDetails = ({ product }: ProductsDetailsProps) => {
-  const { toggleCart } = useContext(CartContext)
+  const { toggleCart, addProduct } = useContext(CartContext)
   const [quantity, setQuantity] = useState<number>(1);
   const handleQuantityDecrease = () => {
     setQuantity((prev) => {
@@ -37,6 +38,10 @@ const ProductsDetails = ({ product }: ProductsDetailsProps) => {
     setQuantity((prev) => prev + 1)
   }
   const handleAddToCart = () => {
+    addProduct({
+      ...product,
+      quantity,
+    })
     toggleCart();
   }
   return ( 
@@ -85,6 +90,7 @@ const ProductsDetails = ({ product }: ProductsDetailsProps) => {
 
         <Button className="mt-6 w-full rounded-full" onClick={handleAddToCart}>Adicionar à sacola</Button>
       </div>
+      <CartSheet />
     </>
   );
 }
