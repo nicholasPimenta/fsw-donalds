@@ -20,7 +20,7 @@ const ComsumptionOption = ({ slug, imageSrc, imageAlt, buttonText, option }: Com
               <Image src={imageSrc} fill alt={imageAlt} className="object-contain" />
             </div>
             <Button variant="secondary" className="rounded-full">
-                <Link href={`/${slug}/menu?consumption-method=${option}`}>
+                <Link href={`/${slug}/menu?orderConsumptionMethod=${option}`}>
                 {buttonText}
                 </Link>
             </Button>
