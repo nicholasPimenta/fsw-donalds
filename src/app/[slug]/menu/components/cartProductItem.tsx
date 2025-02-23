@@ -1,5 +1,3 @@
-"use client"
-
 import Image from "next/image";
 import { CartContext, CartProduct } from "../contexts/cart";
 import { formatCurrency } from "@/app/helpers/format-currency";
