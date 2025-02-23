@@ -5,22 +5,22 @@ import { OrderConsumptionMethod } from "@prisma/client"
 import { removeCpfPunctuation } from "../helpers/cpf"
 
 interface CreateOrderInput {
-  customerName: string,
-  customerCpf: string,
+  customerName: string;
+  customerCpf: string;
   products: Array<{
     id: string,
-    quantity: number
-  }>
-  orderConsumptionMethod: OrderConsumptionMethod,
-  slug: string,
+    quantity: number;
+  }>;
+  orderConsumptionMethod: OrderConsumptionMethod;
+  slug: string;
 }
 
 export const createOrder = async (input : CreateOrderInput) => {
   const restaurant = await db.restaurant.findUnique({
     where: {
       slug: input.slug,
-    }
-  })
+    },
+  });
   if (!restaurant) {
     throw new Error("Restaurant not found!")
   }
@@ -47,10 +47,11 @@ export const createOrder = async (input : CreateOrderInput) => {
         },
       },
       total: productsWithPricesAndQuantities.reduce(
-        (acc, product) => acc + product.price * product.quantity
-      , 0),
+        (acc, product) => acc + product.price * product.quantity, 
+        0,
+      ),
       consumptionMethod: input.orderConsumptionMethod,
       restaurantId: restaurant.id,
     },
-  })
+  });
 }

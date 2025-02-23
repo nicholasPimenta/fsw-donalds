@@ -30,8 +30,10 @@ import { Input } from "@/components/ui/input";
 import { createOrder } from "../actions/createOrder";
 import { useParams, useSearchParams } from "next/navigation";
 import { OrderConsumptionMethod } from "@prisma/client";
-import { useContext } from "react";
+import { useContext, useTransition } from "react";
 import { CartContext } from "../contexts/cart";
+import { toast } from "sonner";
+import { Loader2Icon } from "lucide-react";
  
 const formSchema = z.object({
   name: z.string().trim().min(3, {
@@ -52,9 +54,10 @@ interface FinishOrderDialogProps {
 }
 
 const FinishOrderDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
-  const { slug } = useParams<{ slug: string }>()
-  const { products } = useContext(CartContext)
+  const { slug } = useParams<{ slug: string }>();
+  const { products } = useContext(CartContext);
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -66,14 +69,19 @@ const FinishOrderDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
 
 const onSubmit = async (data: FormSchema) => {
   try {
-    const orderConsumptionMethod = searchParams.get("consumptionMethod") as OrderConsumptionMethod;
-    await createOrder({
-      orderConsumptionMethod,
-      customerCpf: data.cpf,
-      customerName: data.name,
-      products,
-      slug
+    const orderConsumptionMethod = searchParams.get("orderConsumptionMethod") as OrderConsumptionMethod;
+    startTransition(async () => {
+      await createOrder({
+        orderConsumptionMethod,
+        customerCpf: data.cpf,
+        customerName: data.name,
+        products,
+        slug,
+      });
+      onOpenChange(false)
+      toast.success("Pedido finalizado com sucesso!");
     });
+    
   } catch (error) {
     console.error(error)
   }
@@ -123,7 +131,12 @@ const onSubmit = async (data: FormSchema) => {
               )}
             />
             <DrawerFooter>
-              <Button type="submit" variant="destructive" className="rounded-full">Confirmar</Button>
+              <Button 
+                type="submit" 
+                variant="destructive" 
+                className="rounded-full" 
+                disabled={isPending}
+              >{isPending && <Loader2Icon className="animate-spin" /> }  Confirmar</Button>
               <DrawerClose asChild>
                 <Button variant="outline" className="w-full rounded-full">Cancelar</Button>
               </DrawerClose>
